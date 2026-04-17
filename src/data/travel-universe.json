@@ -1,0 +1,99 @@
+{
+  "cities": [
+    {
+      "name": "潍坊市",
+      "englishName": "Weifang",
+      "province": "山东省",
+      "country": "中国",
+      "type": "resident",
+      "residentEmoji": "⭐",
+      "rating": 5
+    },
+    {
+      "name": "杭州市",
+      "englishName": "Hangzhou",
+      "province": "浙江省",
+      "country": "中国",
+      "type": "resident",
+      "residentEmoji": "🦎",
+      "rating": 5
+    },
+    {
+      "name": "济南市",
+      "englishName": "Jinan",
+      "province": "山东省",
+      "country": "中国",
+      "type": "unlocked",
+      "unlockDate": "2025.11.07",
+      "rating": 5
+    },
+    {
+      "name": "无锡市",
+      "englishName": "Wuxi",
+      "province": "江苏省",
+      "country": "中国",
+      "type": "unlocked",
+      "unlockDate": "2025.12.31",
+      "rating": 3.5
+    },
+    {
+      "name": "许昌市",
+      "englishName": "Xuchang",
+      "province": "河南省",
+      "country": "中国",
+      "type": "unlocked",
+      "unlockDate": "2026.02.22",
+      "rating": 4
+    },
+    {
+      "name": "上海",
+      "englishName": "Shanghai",
+      "province": "上海",
+      "country": "中国",
+      "type": "unlocked",
+      "unlockDate": "2025.12.08",
+      "rating": 4
+    },
+    {
+      "name": "苏州市",
+      "englishName": "Suzhou",
+      "province": "江苏省",
+      "country": "中国",
+      "type": "unlocked",
+      "unlockDate": "2026.04.03",
+      "rating": 3
+    },
+    {
+      "name": "重庆",
+      "englishName": "Chongqing",
+      "province": "重庆",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["⭐", "🦎"]
+    },
+    {
+      "name": "延边朝鲜族自治州",
+      "englishName": "Yanbian Korean Autonomous Prefecture",
+      "province": "吉林省",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["🦎"]
+    },
+    {
+      "name": "南京市",
+      "englishName": "Nanjing",
+      "province": "江苏省",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["⭐", "🦎"]
+    },
+    {
+      "name": "Kowloon",
+      "englishName": "Kowloon",
+      "province": "香港",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["⭐"]
+    }
+  ]
+}
