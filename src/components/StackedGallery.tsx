@@ -16,7 +16,7 @@ export const StackedGallery: React.FC<StackedGalleryProps> = ({ cityName }) => {
   useEffect(() => {
     setLoading(true);
     const potentialImages = Array.from({ length: 10 }, (_, i) => 
-      `/src/data/${cityName}/${i + 1}.jpg`
+      `/public/data/${cityName}/${i + 1}.jpg`
     );
 
     // 检查哪些图片是真实存在的
