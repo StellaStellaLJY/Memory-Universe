@@ -31,6 +31,10 @@ export const WeatherEffect: React.FC<WeatherEffectProps> = ({ type }) => {
           {[...Array(50)].map((_, i) => (
             <motion.div
               key={i}
+              style={{ 
+                left: `${Math.random() * 100}%`,
+                top: -40 
+              }}
               initial={{ y: -20, x: Math.random() * 100 + '%' }}
               animate={{ y: '110vh' }}
               transition={{
@@ -50,6 +54,10 @@ export const WeatherEffect: React.FC<WeatherEffectProps> = ({ type }) => {
           {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
+              style={{ 
+                left: `${Math.random() * 100}%`,
+                top: -40 
+              }}
               initial={{ y: -20, x: Math.random() * 100 + '%' }}
               animate={{ 
                 y: '110vh',
@@ -72,6 +80,10 @@ export const WeatherEffect: React.FC<WeatherEffectProps> = ({ type }) => {
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
+              style={{ 
+                left: `${Math.random() * 100}%`,
+                top: -40 
+              }}
               initial={{ x: '-100%', y: Math.random() * 60 + '%' }}
               animate={{ x: '110%' }}
               transition={{
