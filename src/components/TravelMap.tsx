@@ -95,7 +95,7 @@ export const TravelMap: React.FC = () => {
   // Load map data
   useEffect(() => {
     let isMounted = true;
-    fetch('/china-cities.json')
+    fetch('./china-cities.json')
       .then(res => {
         if (!res.ok) throw new Error('Map file not found');
         return res.json();
