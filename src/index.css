@@ -14,19 +14,15 @@
 @layer base {
   body {
     @apply bg-cosmic-bg text-white overflow-hidden antialiased;
-    /* 语法：url(路径) 偏移量X 偏移量Y, 备用光标类型 */
-    /* 0 0 代表点击生效的点在图片的左上角 */
-    cursor: url('/plane.png') 0 0, auto;
-    }
+    /* 核心修复：去掉开头的斜杠，改为相对路径 */
+    cursor: url('./plane.png') 0 0, auto;
+  }
 
-    /* 当鼠标移到可点击元素（如按钮、地图城市）时，也可以换一个样式或者保持 */
+  /* 同样修改此处 */
   a, button, .cursor-pointer {
-    cursor: url('/plane.png') 0 0, pointer;
+    cursor: url('./plane.png') 0 0, pointer;
   }
 }
-/* index.css */
-
-
 
 @layer utilities {
   @keyframes simple-pulse {
