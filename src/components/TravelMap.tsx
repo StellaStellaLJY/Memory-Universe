@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import * as topojson from 'topojson-client';
 import { motion, AnimatePresence } from 'motion/react';
 import { WeatherEffect, WeatherType } from './WeatherEffect';
 import { Cloud, CloudRain, Sun, Zap, Snowflake, X, Star } from 'lucide-react';
@@ -8,7 +9,7 @@ const WeatherIcon = ({ condition }: { condition?: string }) => {
   if (!condition) return null;
   const c = condition.toLowerCase();
   if (c.includes('rain')) return <CloudRain className="w-5 h-5 text-blue-400" />;
-  if (c.includes('cloud')) return <Cloud className="w-5 h-5 text-white/60" />;
+  if (c.includes('clouds')) return <Cloud className="w-5 h-5 text-white/60" />;
   if (c.includes('snow')) return <Snowflake className="w-5 h-5 text-white" />;
   if (c.includes('storm')) return <Zap className="w-5 h-5 text-amber-300" />;
   return <Sun className="w-5 h-5 text-amber-400" />;
@@ -48,6 +49,7 @@ export const TravelMap: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<CityData | null>(null);
   const [hoverCity, setHoverCity] = useState<string | null>(null);
   const [mapData, setMapData] = useState<any>(null);
+  const [topologyData, setTopologyData] = useState<any>(null);
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
 
   const fetchWeather = async (city: string) => {
@@ -98,7 +100,32 @@ export const TravelMap: React.FC = () => {
         return res.json();
       })
       .then(data => {
-        if (isMounted) setMapData(data);
+        if (!isMounted) return;
+        
+        let features: any[] = [];
+        
+        if (data.type === 'Topology') {
+          setTopologyData(data);
+          // Handle TopoJSON
+          const objectName = Object.keys(data.objects)[0];
+          if (objectName) {
+            const geojson: any = topojson.feature(data, data.objects[objectName]);
+            features = geojson.features || [];
+          }
+        } else {
+          // Handle GeoJSON
+          features = Array.isArray(data) ? data : (data.features || []);
+        }
+
+        const geojson = { type: 'FeatureCollection', features };
+        
+        // Pre-match city info for performance
+        features.forEach((f: any) => {
+          const cityName = f.properties.NL_NAME_2 || f.properties.NAME_2 || f.properties.name || "";
+          f.matchedCityInfo = INITIAL_CITIES.find(c => cityName.includes(c.name) || c.name.includes(cityName));
+        });
+
+        setMapData(geojson);
       })
       .catch(err => {
         console.error("Map load error:", err);
@@ -113,13 +140,13 @@ export const TravelMap: React.FC = () => {
     const width = containerRef.current.clientWidth;
     const height = containerRef.current.clientHeight;
 
-    // Use a fixed center if needed, or calculate from mapData
     const projection = d3.geoMercator()
       .center([105, 38])
-      .scale(Math.min(width, height) * 0.8)
+      .scale(width > 1200 ? 1000 : 800)
       .translate([width / 2, height / 2]);
-
+    
     const path = d3.geoPath().projection(projection);
+    const geoData = mapData;
 
     svg.selectAll('*').remove();
     
@@ -154,43 +181,59 @@ export const TravelMap: React.FC = () => {
       .scaleExtent([0.5, 20])
       .on('zoom', (event) => {
         if (event.transform) {
-          // ENSURE transform is a valid matrix string
-          g.attr('transform', `translate(${event.transform.x},${event.transform.y}) scale(${event.transform.k})`);
+          g.attr('transform', event.transform.toString());
+          // Keep markers at a constant visual size
+          g.selectAll('.resident-marker')
+            .style('font-size', `${20 / event.transform.k}px`)
+            .attr('dy', `${-12 / event.transform.k}`);
         }
       });
 
     svg.call(zoom as any);
+    
+    // Store zoom behavior for external use
+    (svg as any)._zoom = zoom;
+    (svg as any)._width = width;
+    (svg as any)._height = height;
 
-    // Draw Layers: 1) City, 2) Provincial, 3) National
-    // Layer 1: Cities (Geometric base)
+    // Draw Layers
     const citiesGroup = g.append('g').attr('class', 'cities-layer');
     citiesGroup.selectAll('path')
-      .data(mapData.features)
+      .data(geoData.features)
       .enter()
       .append('path')
+      .attr('tabindex', -1)          // ✅ 禁止 focus
+      .style('outline', 'none')      // ✅ 去掉 outline
+      .style('-webkit-tap-highlight-color', 'transparent') // ✅ 防止高亮（Chrome）
       .attr('d', path as any)
       .attr('class', (d: any) => {
-        const cityName = d.properties.NL_NAME_2 || d.properties.NAME_2 || d.properties.name || "";
-        const cityInfo = INITIAL_CITIES.find(c => cityName.includes(c.name) || c.name.includes(cityName));
+        const cityInfo = d.matchedCityInfo;
         
         return cn(
-          "cursor-pointer fill-white/[0.05] stroke-white/[0.1] hover:fill-white/20 hover:stroke-white/30 transition-colors duration-300 outline-none stroke-[0.5px]",
+          "cursor-pointer fill-white/[0.04] stroke-white/[0.08] transition-shadow duration-300 outline-none stroke-[0.8px]",
           cityInfo?.type === 'unlocked' && "fill-white/30 stroke-white/50",
-          cityInfo?.type === 'resident' && "fill-emerald-200/20 stroke-emerald-200/40",
-          cityInfo?.type === 'wishlist' && "fill-sky-300/10 stroke-sky-300/30"
+          cityInfo?.type === 'resident' && "fill-emerald-400/20 stroke-emerald-400/40",
+          cityInfo?.type === 'wishlist' && "fill-sky-400/10 stroke-sky-400/30"
         );
       })
+      .style('vector-effect', 'non-scaling-stroke')
       .on('mouseenter', function(event, d: any) {
-        d3.select(this).raise().transition().duration(200).style('fill', 'rgba(255,255,255,0.3)');
+        d3.select(this);
+        d3.select(this).transition().duration(200)
+          .style('fill', 'rgba(200,220,255,0.10)')
+          .style('transform', 'translateY(-2px)');
+        
         setHoverCity(d.properties.NL_NAME_2 || d.properties.NAME_2 || d.properties.name);
       })
       .on('mouseleave', function(event, d: any) {
-        d3.select(this).transition().duration(400).style('fill', null);
+        d3.select(this).transition().duration(400)
+          .style('fill', null)
+          .style('transform', 'translateY(0px)');
         setHoverCity(null);
       })
       .on('click', function(event, d: any) {
         const cityName = d.properties.NL_NAME_2 || d.properties.NAME_2 || d.properties.name || "";
-        const cityInfo = INITIAL_CITIES.find(c => cityName.includes(c.name) || c.name.includes(cityName)) || {
+        const cityInfo = d.matchedCityInfo || {
           name: cityName,
           englishName: d.properties.NAME_2 || cityName,
           province: d.properties.NAME_1 || 'Unknown',
@@ -198,7 +241,10 @@ export const TravelMap: React.FC = () => {
           type: 'wishlist',
         };
         
-        const [[x0, y0], [x1, y1]] = path.bounds(d);
+        const centroid = path.centroid(d);
+        if (!centroid || isNaN(centroid[0])) return;
+        const [x, y] = centroid;
+        
         event.stopPropagation();
         
         svg.transition().duration(1000)
@@ -206,52 +252,77 @@ export const TravelMap: React.FC = () => {
           .call(
             zoom.transform,
             d3.zoomIdentity
-              .translate(width * 0.4, height / 2)
-              .scale(Math.min(10, 0.7 / Math.max((x1 - x0) / width, (y1 - y0) / height)))
-              .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+              .translate(width * 0.35, height * 0.5) // Shift left to make room for panel
+              .scale(2.5) // Moderate zoom, not too tight
+              .translate(-x, -y)
           );
         setSelectedCity(cityInfo as CityData);
       });
 
-    // Layer 2: Provincial Borders (GID_1 groups)
-    // We draw them again grouped by GID_1 to emphasize province boundaries.
-    const provinceEntries = d3.groups(mapData.features, (d: any) => d.properties.GID_1);
-    const provincesGroup = g.append('g').attr('class', 'provinces-layer pointer-events-none');
-    
-    provincesGroup.selectAll('path')
-      .data(provinceEntries.map(e => ({ type: 'FeatureCollection', features: e[1] })))
-      .enter()
-      .append('path')
-      .attr('d', path as any)
-      .attr('class', 'fill-none stroke-white/20 stroke-[1.5px]');
+    // Layer 2: Provincial Borders (Mesh for efficiency and differentiation)
+    if (topologyData) {
+      const objectName = Object.keys(topologyData.objects)[0];
+      const provinceMesh = topojson.mesh(topologyData, topologyData.objects[objectName], (a, b) => 
+        a !== b && (a.properties.GID_1 !== b.properties.GID_1 || a.properties.NAME_1 !== b.properties.NAME_1)
+      );
 
-    // Layer 3: National Boundary (GID_0)
-    g.append('path')
-      .datum(mapData)
-      .attr('d', path as any)
-      .attr('class', 'fill-white/[0.02] stroke-white/60 stroke-[2.2px] pointer-events-none')
-      .style('filter', 'url(#map-shadow-glow)');
+      g.append('path')
+        .datum(provinceMesh)
+        .attr('d', path as any)
+        .attr('class', 'fill-none stroke-white/20 stroke-[1px] pointer-events-none')
+        .style('vector-effect', 'non-scaling-stroke');
+      
+      // National Boundary
+      const countryMesh = topojson.mesh(topologyData, topologyData.objects[objectName], (a, b) => a === b);
+      g.append('path')
+        .datum(countryMesh)
+        .attr('d', path as any)
+        .attr('class', 'fill-none stroke-white/50 stroke-[2px] pointer-events-none')
+        .style('vector-effect', 'non-scaling-stroke')
+        .style('filter', 'url(#map-shadow-glow)');
+    } else {
+      // Fallback for GeoJSON or when topology fails
+      const provinceEntries = d3.groups(geoData.features, (d: any) => d.properties.GID_1);
+      const provincesGroup = g.append('g').attr('class', 'provinces-layer pointer-events-none');
+      
+      provincesGroup.selectAll('path')
+        .data(provinceEntries)
+        .enter()
+        .append('path')
+        .attr('d', (d: any) => {
+          return path({ type: 'FeatureCollection', features: d[1] } as any);
+        })
+        .attr('class', 'fill-none stroke-white/10 stroke-[0.5px]')
+        .style('vector-effect', 'non-scaling-stroke');
+
+      // National Boundary with Glow and Shadow
+      g.append('path')
+        .datum(mapData)
+        .attr('d', path as any)
+        .attr('class', 'fill-none stroke-white/40 stroke-[1.5px] pointer-events-none')
+        .style('vector-effect', 'non-scaling-stroke')
+        .style('filter', 'url(#map-shadow-glow)');
+    }
 
     // Resident Markers
     const markersGroup = g.append('g').attr('class', 'resident-markers');
-    const residentFeatures = mapData.features.filter((d: any) => {
-      const cityName = d.properties.NL_NAME_2 || d.properties.NAME_2 || d.properties.name || "";
-      const info = INITIAL_CITIES.find(c => (cityName.includes(c.name) || c.name.includes(cityName)) && c.type === 'resident');
-      return !!info;
-    });
+    const residentFeatures = geoData.features.filter((d: any) => d.matchedCityInfo?.type === 'resident');
 
-    markersGroup.selectAll('text')
+    markersGroup.selectAll('g')
       .data(residentFeatures)
       .enter()
+      .append('g')
+      .attr('transform', (d: any) => {
+        const centroid = path.centroid(d);
+        if (!centroid || isNaN(centroid[0])) return 'translate(0,0)';
+        return `translate(${centroid[0]},${centroid[1]})`;
+      })
       .append('text')
-      .attr('x', (d: any) => path.centroid(d)[0])
-      .attr('y', (d: any) => path.centroid(d)[1])
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
-      .attr('class', 'pointer-events-none select-none')
-      .style('font-size', '16px')
-      .style('filter', 'drop-shadow(0 4px 6px rgba(0,0,0,0.9))')
-      .attr('dy', '-5')
+      .attr('class', 'resident-marker pointer-events-none select-none drop-shadow-[0_8px_12px_rgba(0,0,0,1)]')
+      .style('font-size', '20px')
+      .attr('dy', '-12')
       .text('📍');
 
     // Initial position
@@ -263,6 +334,18 @@ export const TravelMap: React.FC = () => {
     window.addEventListener('resize', drawMap);
     return () => window.removeEventListener('resize', drawMap);
   }, [drawMap]);
+
+  useEffect(() => {
+    if (!selectedCity && svgRef.current) {
+      const svg = d3.select(svgRef.current);
+      const zoom = (svg as any)._zoom;
+      if (zoom) {
+        svg.transition().duration(800)
+          .ease(d3.easeExpInOut)
+          .call(zoom.transform, d3.zoomIdentity);
+      }
+    }
+  }, [selectedCity]);
 
   const handleMapClick = () => {
     setSelectedCity(null);
@@ -327,28 +410,28 @@ export const TravelMap: React.FC = () => {
                   </div>
                 )}
               </div>
-              <p className="text-xs font-mono uppercase opacity-40 tracking-[0.2em] mt-2">
+              <p className="text-xs font-mono uppercase opacity-60 tracking-[0.2em] mt-2">
                 {selectedCity.englishName} • {selectedCity.province}
               </p>
             </div>
 
             <div className="space-y-5">
               <div className="flex justify-between items-center py-2">
-                <span className="text-[10px] opacity-40 uppercase font-mono tracking-widest">Experience</span>
+                <span className="text-[10px] opacity-60 uppercase font-mono tracking-widest">Experience</span>
                 <StarRating rating={selectedCity.rating || 0} active={!!selectedCity.rating} />
               </div>
 
               {selectedCity.type === 'unlocked' && (
                 <div className="pt-5 border-t border-white/5">
-                  <p className="text-[10px] uppercase opacity-40 font-mono tracking-widest">Captured Space-Time</p>
+                  <p className="text-[10px] uppercase opacity-40 font-mono tracking-widest">解锁时间</p>
                   <p className="text-lg font-display mt-1">{selectedCity.unlockDate}</p>
                 </div>
               )}
 
               {selectedCity.wantsToGo && (
                 <div className="pt-5 border-t border-white/5">
-                  <p className="text-[10px] uppercase opacity-40 font-mono italic tracking-widest text-amber-400/60">
-                    {selectedCity.wantsToGo.join(' & ')} Dreaming of this place
+                  <p className="text-[10px] uppercase opacity-80 font-mono italic tracking-widest text-sky-300/80">
+                    {selectedCity.wantsToGo.join(' & ')} 想去
                   </p>
                 </div>
               )}
@@ -366,7 +449,7 @@ export const TravelMap: React.FC = () => {
             exit={{ opacity: 0, scale: 0.9 }}
             className="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-none px-6 py-2 glass rounded-full shadow-2xl"
           >
-             <p className="text-sm font-display tracking-[0.3em] uppercase text-white/80 italic">{hoverCity}</p>
+             <p className="text-sm font-display tracking-[0.3em] uppercase text-white/40 italic">{hoverCity}</p>
           </motion.div>
         )}
       </AnimatePresence>

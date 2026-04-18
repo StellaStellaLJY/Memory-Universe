@@ -33,7 +33,7 @@ export const Splash: React.FC<SplashProps> = ({ onNext }) => {
           <div className="flex flex-col items-center gap-2">
             <div className="w-16 h-[1px] bg-white/5" />
           </div>
-          <p className="text-white/40 text-base font-mono tracking-[0.5em] mt-4">⭐ & 🦎</p>
+          <p className="text-white/40 text-lg font-mono tracking-[1em] mt-8 mb-8">⭐ & 🦎</p>
         </motion.div>
       </div>
 
@@ -42,7 +42,7 @@ export const Splash: React.FC<SplashProps> = ({ onNext }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 1 }}
-        className="group relative flex flex-col items-center gap-2 transition-transform hover:scale-110 active:scale-95"
+        className="group relative flex flex-col items-center gap-2 mb-12 transition-transform hover:scale-110 active:scale-95"
       >
         <p className="text-[10px] text-white/20 font-mono tracking-[0.3em] uppercase group-hover:text-white/40 transition-colors">Launch</p>
         <motion.div

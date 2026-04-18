@@ -6,24 +6,24 @@ export const Background: React.FC<{ page?: string }> = ({ page }) => {
     <div className="fixed inset-0 -z-10 overflow-hidden bg-cosmic-bg">
       {/* Stars Layer 1 - Larger Base Stars */}
       <div 
-        className="absolute inset-0 animate-simple-pulse opacity-80"
+        className="absolute inset-0 animate-simple-pulse opacity-90"
         style={{
-          backgroundImage: `radial-gradient(2.5px 2.5px at 20px 30px, #fff, rgba(0,0,0,0)),
-                            radial-gradient(2.5px 2.5px at 140px 170px, #fff, rgba(0,0,0,0)),
-                            radial-gradient(2px 2px at 250px 160px, #fff, rgba(0,0,0,0)),
-                            radial-gradient(2px 2px at 100px 200px, #fff, rgba(0,0,0,0))`,
+          backgroundImage: `radial-gradient(3px 3px at 20px 30px, #fff, rgba(0,0,0,0)),
+                            radial-gradient(3.5px 3.5px at 140px 170px, #fff, rgba(0,0,0,0)),
+                            radial-gradient(2.5px 2.5px at 250px 160px, #fff, rgba(0,0,0,0)),
+                            radial-gradient(2px 2px at 100px 200px, #ddd, rgba(0,0,0,0))`,
           backgroundSize: '300px 300px'
         }}
       />
 
       {/* Stars Layer 2 - Colorful Vivid Stars */}
       <div 
-        className="absolute inset-0 opacity-60"
+        className="absolute inset-0 opacity-75"
         style={{
-          backgroundImage: `radial-gradient(3.5px 3.5px at 50px 50px, #93c5fd, rgba(0,0,0,0)),
-                            radial-gradient(4px 4px at 150px 250px, #fde68a, rgba(0,0,0,0)),
-                            radial-gradient(3px 3px at 300px 100px, #f9a8d4, rgba(0,0,0,0)),
-                            radial-gradient(2.5px 2.5px at 400px 400px, #c4b5fd, rgba(0,0,0,0))`,
+          backgroundImage: `radial-gradient(4.5px 4.5px at 50px 50px, #93c5fd, rgba(0,0,0,0)),
+                            radial-gradient(5px 5px at 150px 250px, #fde68a, rgba(0,0,0,0)),
+                            radial-gradient(4px 4px at 300px 100px, #f9a8d4, rgba(0,0,0,0)),
+                            radial-gradient(3.5px 3.5px at 400px 400px, #c4b5fd, rgba(0,0,0,0))`,
           backgroundSize: '500px 500px'
         }}
       />
@@ -49,18 +49,17 @@ export const Background: React.FC<{ page?: string }> = ({ page }) => {
       {/* Solar System Planets (Home Page Only) */}
       {page === 'home' && (
         <div className="absolute inset-0 z-10 pointer-events-none">
-          {/* Top Left Quadrant */}
-          <Planet name="Neptune" color="from-blue-600/40 via-blue-500/30 to-blue-900/40" size="w-24 h-24" top="15%" left="10%" delay={0} />
-          {/* Top Right Quadrant */}
-          <Planet name="Jupiter" color="from-orange-200/40 via-yellow-100/30 to-orange-400/40" size="w-48 h-48" top="10%" left="70%" delay={2} />
-          {/* Bottom Left Quadrant */}
-          <Planet name="Saturn" color="from-yellow-100/40 via-orange-100/30 to-orange-300/40" size="w-40 h-40" top="65%" left="5%" delay={6} rings />
-          {/* Bottom Right Quadrant */}
-          <Planet name="Mars" color="from-red-500/40 via-orange-400/30 to-red-900/40" size="w-16 h-16" top="80%" left="75%" delay={4} />
-          {/* Center-ish / Floating */}
-          <Planet name="Uranus" color="from-cyan-300/40 via-blue-200/30 to-cyan-500/40" size="w-20 h-20" top="45%" left="40%" delay={8} />
-          <Planet name="Venus" color="from-amber-200/40 via-yellow-100/30 to-amber-500/40" size="w-20 h-20" top="30%" left="85%" delay={10} />
-          <Planet name="Mercury" color="from-gray-400/40 via-gray-300/30 to-gray-600/40" size="w-12 h-12" top="85%" left="30%" delay={12} />
+          {/* Main Cluster - Right Side */}
+          <Planet name="Jupiter" color="from-orange-200/40 via-yellow-100/30 to-orange-400/40" size="w-56 h-56" top="15%" left="65%" delay={2} />
+          <Planet name="Mars" color="from-red-500/40 via-orange-400/30 to-red-900/40" size="w-20 h-20" top="35%" left="75%" delay={4} />
+          <Planet name="Uranus" color="from-cyan-300/40 via-blue-200/30 to-cyan-500/40" size="w-28 h-28" top="42%" left="82%" delay={8} />
+          <Planet name="Pluto" color="from-slate-500/30 via-slate-400/20 to-slate-700/30" size="w-10 h-10" top="25%" left="85%" delay={15} />
+          
+          {/* Secondary Cluster - Left Side */}
+          <Planet name="Neptune" color="from-blue-600/40 via-blue-500/30 to-blue-900/40" size="w-24 h-24" top="12%" left="8%" delay={0} />
+          <Planet name="Venus" color="from-amber-200/40 via-yellow-100/30 to-amber-500/40" size="w-22 h-22" top="28%" left="12%" delay={10} />
+          <Planet name="Mercury" color="from-gray-400/40 via-gray-300/30 to-gray-600/40" size="w-14 h-14" top="35%" left="5%" delay={12} />
+          <Planet name="Saturn" color="from-yellow-100/40 via-orange-100/30 to-orange-300/40" size="w-44 h-44" top="65%" left="15%" delay={6} rings />
         </div>
       )}
       
@@ -111,8 +110,12 @@ const Planet = ({ name, color, size, top, left, delay, rings }: any) => (
       repeat: Infinity, 
       ease: "linear" 
     }}
-    className={`absolute ${size} ${top} ${left} rounded-full blur-[0.5px] shadow-[0_0_60px_rgba(255,255,255,0.05)] overflow-visible`}
-    style={{ zIndex: 5 }}
+    className={`absolute ${size} rounded-full blur-[0.5px] shadow-[0_0_60px_rgba(255,255,255,0.05)] overflow-visible`}
+    style={{ 
+      zIndex: 5,
+      top,
+      left
+    }}
   >
     {rings && (
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240%] h-[20%] border border-white/10 rounded-[100%] rotate-[25deg] blur-[1px] shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]" />
