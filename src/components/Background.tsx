@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { Comets } from './Comets'; // 引入彗星组件
 
 export const Background: React.FC<{ page?: string }> = ({ page }) => {
   return (
@@ -45,6 +46,9 @@ export const Background: React.FC<{ page?: string }> = ({ page }) => {
           filter: 'blur(130px)',
         }}
       />
+      
+      {/* --- 插入彗星层 --- */}
+      <Comets />
 
       {/* Solar System Planets (Home Page Only) */}
       {page === 'home' && (
@@ -52,14 +56,14 @@ export const Background: React.FC<{ page?: string }> = ({ page }) => {
           {/* Main Cluster - Right Side */}
           <Planet name="Jupiter" color="from-orange-200/40 via-yellow-100/30 to-orange-400/40" size="w-56 h-56" top="15%" left="65%" delay={2} />
           <Planet name="Mars" color="from-red-500/40 via-orange-400/30 to-red-900/40" size="w-20 h-20" top="35%" left="75%" delay={4} />
-          <Planet name="Uranus" color="from-cyan-300/40 via-blue-200/30 to-cyan-500/40" size="w-28 h-28" top="42%" left="82%" delay={8} />
+          <Planet name="Uranus" color="from-cyan-300/40 via-blue-200/30 to-cyan-500/40" size="w-28 h-28" top="62%" left="82%" delay={8} />
           <Planet name="Pluto" color="from-slate-500/30 via-slate-400/20 to-slate-700/30" size="w-10 h-10" top="25%" left="85%" delay={15} />
           
           {/* Secondary Cluster - Left Side */}
-          <Planet name="Neptune" color="from-blue-600/40 via-blue-500/30 to-blue-900/40" size="w-24 h-24" top="12%" left="8%" delay={0} />
-          <Planet name="Venus" color="from-amber-200/40 via-yellow-100/30 to-amber-500/40" size="w-22 h-22" top="28%" left="12%" delay={10} />
-          <Planet name="Mercury" color="from-gray-400/40 via-gray-300/30 to-gray-600/40" size="w-14 h-14" top="35%" left="5%" delay={12} />
-          <Planet name="Saturn" color="from-yellow-100/40 via-orange-100/30 to-orange-300/40" size="w-44 h-44" top="65%" left="15%" delay={6} rings />
+          <Planet name="Neptune" color="from-blue-600/40 via-blue-500/30 to-blue-900/40" size="w-24 h-24" top="35%" left="25%" delay={0} />
+          <Planet name="Venus" color="from-amber-200/40 via-yellow-100/30 to-amber-500/40" size="w-22 h-22" top="50%" left="12%" delay={10} />
+          <Planet name="Mercury" color="from-gray-400/40 via-gray-300/30 to-gray-600/40" size="w-14 h-14" top="45%" left="8%" delay={12} />
+          <Planet name="Saturn" color="from-yellow-100/40 via-orange-100/30 to-orange-300/40" size="w-44 h-44" top="70%" left="20%" delay={6} rings />
         </div>
       )}
       
@@ -76,7 +80,32 @@ export const Background: React.FC<{ page?: string }> = ({ page }) => {
           backgroundSize: '200px 200px'
         }}
       />
-      
+
+      {/* 1. 增加强对比色块 - 极光效果 */}
+      <motion.div
+        animate={{
+          rotate: [0, 360],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        className="absolute -top-1/4 -right-1/4 w-[70%] h-[70%] rounded-full opacity-30 pointer-events-none"
+        style={{
+          background: 'conic-gradient(from 0deg, transparent, #4338ca, #6366f1, transparent)',
+          filter: 'blur(100px)',
+        }}
+      />
+
+      {/* 2. 增加高亮光斑 - 专门为磨砂玻璃准备 */}
+      <motion.div
+        animate={{
+          opacity: [0.4, 0.7, 0.4],
+          x: [0, 100, 0],
+          y: [0, 50, 0],
+        }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-1/4 right-1/3 w-64 h-64 rounded-full bg-emerald-500/20 blur-[90px]"
+      /> 
+ 
       {/* Dynamic Floating Glows */}
       <motion.div
         animate={{

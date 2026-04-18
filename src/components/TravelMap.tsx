@@ -4,6 +4,7 @@ import * as topojson from 'topojson-client';
 import { motion, AnimatePresence } from 'motion/react';
 import { WeatherEffect, WeatherType } from './WeatherEffect';
 import { Cloud, CloudRain, Sun, Zap, Snowflake, X, Star } from 'lucide-react';
+import { StackedGallery } from './StackedGallery';
 
 const WeatherIcon = ({ condition }: { condition?: string }) => {
   if (!condition) return null;
@@ -158,14 +159,14 @@ export const TravelMap: React.FC = () => {
       .attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
     mapFilter.append('feGaussianBlur')
       .attr('in', 'SourceAlpha')
-      .attr('stdDeviation', '12')
+      .attr('stdDeviation', '6')
       .attr('result', 'blur');
     mapFilter.append('feOffset')
       .attr('in', 'blur')
       .attr('dx', '0').attr('dy', '10')
       .attr('result', 'offsetBlur');
     mapFilter.append('feFlood')
-      .attr('flood-color', 'rgba(255,255,255,0.1)')
+      .attr('flood-color', 'rgba(255,255,255,0.8)')
       .attr('result', 'glowColor');
     mapFilter.append('feComposite')
       .attr('in', 'glowColor').attr('in2', 'blur').attr('operator', 'in')
@@ -205,9 +206,8 @@ export const TravelMap: React.FC = () => {
       .attr('d', path as any)
       .attr('class', (d: any) => {
         const cityInfo = d.matchedCityInfo;
-        
         return cn(
-          "cursor-pointer fill-white/[0.04] stroke-white/[0.08] transition-shadow duration-300 outline-none stroke-[0.8px]",
+          "map-path-base cursor-pointer fill-white/[0.04] stroke-white/[0.08] outline-none stroke-[0.8px]", // 添加基础类
           cityInfo?.type === 'unlocked' && "fill-white/50 stroke-white/80",
           cityInfo?.type === 'resident' && "fill-emerald-200/50 stroke-emerald-200/80",
           cityInfo?.type === 'wishlist' && "fill-sky-200/50 stroke-sky-200/80"
@@ -216,19 +216,18 @@ export const TravelMap: React.FC = () => {
       .style('vector-effect', 'non-scaling-stroke')
       .on('mouseenter', function(event, d: any) {
         d3.select(this).raise();
-        d3.select(this).transition().duration(200)
-          .style('fill', 'rgba(200,220,255,0.10)')
-          .style('transform', 'translateY(-2px)');
+        // 仅仅通过添加 class 来改变外观
+        d3.select(this).classed('map-path-hover', true);
         
         setHoverCity(d.properties.NL_NAME_2 || d.properties.NAME_2 || d.properties.name);
       })
       .on('mouseleave', function(event, d: any) {
-        d3.select(this).transition().duration(400)
-          .style('fill', null)
-          .style('transform', 'translateY(0px)')
-          .style('stroke', null) // ✅ 必须加
+        // 移除 class，样式会自动根据 map-path-base 的 transition 丝滑回退
+        d3.select(this).classed('map-path-hover', false);
+        
         setHoverCity(null);
       })
+
       .on('click', function(event, d: any) {
         const cityName = d.properties.NL_NAME_2 || d.properties.NAME_2 || d.properties.name || "";
         const cityInfo = d.matchedCityInfo || {
@@ -267,7 +266,7 @@ export const TravelMap: React.FC = () => {
       g.append('path')
         .datum(provinceMesh)
         .attr('d', path as any)
-        .attr('class', 'fill-none stroke-white/20 stroke-[1px] pointer-events-none')
+        .attr('class', 'fill-none stroke-white/20 stroke-[2px] pointer-events-none')
         .style('vector-effect', 'non-scaling-stroke');
       
       // National Boundary
@@ -297,7 +296,7 @@ export const TravelMap: React.FC = () => {
       g.append('path')
         .datum(mapData)
         .attr('d', path as any)
-        .attr('class', 'fill-none stroke-white/40 stroke-[1.5px] pointer-events-none')
+        .attr('class', 'fill-none stroke-white/40 stroke-[px] pointer-events-none')
         .style('vector-effect', 'non-scaling-stroke')
         .style('filter', 'url(#map-shadow-glow)');
     }
@@ -418,6 +417,15 @@ export const TravelMap: React.FC = () => {
                 <span className="text-[10px] opacity-60 uppercase font-mono tracking-widest">Experience</span>
                 <StarRating rating={selectedCity.rating || 0} active={!!selectedCity.rating} />
               </div>
+
+              {/* --- 插入开始 --- */}
+              {(selectedCity.type === 'resident' || selectedCity.type === 'unlocked') && (
+                <StackedGallery 
+                  cityName={selectedCity.name} 
+                  imageCount={6} // 或者是你数据里定义的图片数量
+                />
+              )}
+              {/* --- 插入结束 --- */}
 
               {selectedCity.type === 'unlocked' && (
                 <div className="pt-5 border-t border-white/5">

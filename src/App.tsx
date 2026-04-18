@@ -38,7 +38,7 @@ export default function App() {
               onClick={() => setPage('home')}
               className="text-[10px] font-mono uppercase tracking-[0.3em] opacity-30 hover:opacity-100 transition-opacity"
              >
-               Back to Origin
+               Back to Home
              </button>
            )}
         </div>

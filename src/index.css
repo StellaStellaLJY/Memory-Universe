@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
-
+/*paper plane icon from https://www.flaticon.com/free-icons/flight" title="flight icons-Flight icons created by Ekros - Flaticon*/
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Playfair Display", serif;
@@ -14,25 +14,107 @@
 @layer base {
   body {
     @apply bg-cosmic-bg text-white overflow-hidden antialiased;
+    /* 语法：url(路径) 偏移量X 偏移量Y, 备用光标类型 */
+    /* 0 0 代表点击生效的点在图片的左上角 */
+    cursor: url('/plane.png') 0 0, auto;
+    }
+
+    /* 当鼠标移到可点击元素（如按钮、地图城市）时，也可以换一个样式或者保持小火箭 */
+  a, button, .cursor-pointer {
+    cursor: url('/plane.png') 0 0, pointer;
   }
 }
+/* index.css */
+
+
 
 @layer utilities {
   @keyframes simple-pulse {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 0.5; }
   }
-  
+  /* 彗星横穿屏幕动画 */
+  @keyframes comet-fly {
+    0% {
+      /* 起始点：屏幕外右上角 */
+      transform: translate(100vw, -10vh) rotate(-45deg) scale(1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1; /* 快速出现 */
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      /* 结束点：屏幕外左下角 */
+      transform: translate(-100px, 110vh) rotate(-45deg) scale(0.5);
+      opacity: 0; /* 慢慢消失 */
+    }
+  }
+
+  /* 彗星头部闪烁动画 */
+  @keyframes comet-pulse {
+    0%, 100% { box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6); }
+    50% { box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.9); }
+  }
+
+  /* 定义彗星的基础样式类 */
+  .comet {
+    position: absolute;
+    /* 彗星身体：一条淡出的线条 */
+    height: 2px;
+    background: linear-gradient(to right, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.1) 40%, transparent 70%);
+    border-radius: 2px;
+    opacity: 0;
+    
+    /* 强制开启 GPU 加速 */
+    will-change: transform, opacity;
+    
+    /* 应用飞行动画：无限循环，线性速度 */
+    animation: comet-fly 15s linear infinite;
+  }
+
+  /* 彗星头部亮点 */
+  .comet::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    /* 应用闪烁动画 */
+    animation: comet-pulse 2s infinite ease-in-out;
+  }
+
+  /* 定义基础路径样式，确保没有 hover 时回归原样 */
+  .map-path-base {
+    transition: fill 0.4s ease, stroke 0.4s ease, transform 0.4s ease !important;
+  }
+
+  /* 强制覆盖 D3 可能残留的任何颜色 */
+  .map-path-hover {
+    fill: rgba(200, 220, 255, 0.15) !important;
+    stroke: rgba(200, 220, 255, 0.8) !important;
+    stroke-width: 1.2px !important;
+    transform: translateY(-2px);
+  }
   .animate-simple-pulse {
     animation: simple-pulse 4s infinite ease-in-out;
   }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
 
   .glass {
-    @apply bg-white/5 backdrop-blur-[20px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+    @apply bg-white/5 backdrop-blur-[24px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
   }
 
   .glass-card {
-    @apply bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] transition-all duration-500;
+    @apply bg-white/15 backdrop-blur-[24px] border border-white/20 rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] transition-all duration-500;
   }
 
   .text-glow {
@@ -44,3 +126,4 @@
     transform: translateY(-2px);
   }
 }
+
