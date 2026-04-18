@@ -14,10 +14,40 @@ export const StackedGallery: React.FC<StackedGalleryProps> = ({ cityName }) => {
 
   // 初始化：生成可能的 10 张图片路径并进行预加载测试
   useEffect(() => {
-    setLoading(true);
-    const potentialImages = Array.from({ length: 10 }, (_, i) => 
-      `./data/${cityName}/${i + 1}.jpg`
-    );
+      setLoading(true);
+      
+      // 1. 强制使用 BASE_URL，确保路径从 /Memory-Universe/ 开始
+      const baseUrl = import.meta.env.BASE_URL;
+
+      const potentialImages = Array.from({ length: 10 }, (_, i) => 
+        `${baseUrl}data/${cityName}/${i + 1}.jpg`
+      );
+
+      const checkImages = async () => {
+        const checks = potentialImages.map(src => {
+          return new Promise<string | null>((resolve) => {
+            const img = new Image();
+            // 2. 关键：对路径进行编码，防止中文文件夹名在某些浏览器失效
+            const encodedSrc = encodeURI(src); 
+            
+            img.onload = () => resolve(encodedSrc); // 存入编码后的绝对路径
+            img.onerror = () => resolve(null);
+            img.src = encodedSrc;
+          });
+        });
+
+        const results = await Promise.all(checks);
+        const filtered = results.filter((r): r is string => r !== null);
+        
+        console.log("Verified Images:", filtered); // 调试用：看看数组里存的是什么
+        
+        setValidImages(filtered);
+        setCurrentIndex(0);
+        setLoading(false);
+      };
+
+      checkImages();
+    }, [cityName]);
 
     // 检查哪些图片是真实存在的
     const checkImages = async () => {
@@ -64,7 +94,7 @@ export const StackedGallery: React.FC<StackedGalleryProps> = ({ cityName }) => {
             const distance = (index - currentIndex + validImages.length) % validImages.length;
             
             if (distance > 2) return null;
-
+console.log('Current Image to display:', validImages[currentIndex]);
             return (
               <motion.div
                 key={src}

@@ -19,7 +19,7 @@
     cursor: url('/plane.png') 0 0, auto;
     }
 
-    /* 当鼠标移到可点击元素（如按钮、地图城市）时，也可以换一个样式或者保持小火箭 */
+    /* 当鼠标移到可点击元素（如按钮、地图城市）时，也可以换一个样式或者保持 */
   a, button, .cursor-pointer {
     cursor: url('/plane.png') 0 0, pointer;
   }
