@@ -202,23 +202,20 @@ export const TravelMap: React.FC = () => {
       .data(geoData.features)
       .enter()
       .append('path')
-      .attr('tabindex', -1)          // ✅ 禁止 focus
-      .style('outline', 'none')      // ✅ 去掉 outline
-      .style('-webkit-tap-highlight-color', 'transparent') // ✅ 防止高亮（Chrome）
       .attr('d', path as any)
       .attr('class', (d: any) => {
         const cityInfo = d.matchedCityInfo;
         
         return cn(
           "cursor-pointer fill-white/[0.04] stroke-white/[0.08] transition-shadow duration-300 outline-none stroke-[0.8px]",
-          cityInfo?.type === 'unlocked' && "fill-white/30 stroke-white/50",
-          cityInfo?.type === 'resident' && "fill-emerald-400/20 stroke-emerald-400/40",
-          cityInfo?.type === 'wishlist' && "fill-sky-400/10 stroke-sky-400/30"
+          cityInfo?.type === 'unlocked' && "fill-white/50 stroke-white/80",
+          cityInfo?.type === 'resident' && "fill-emerald-200/50 stroke-emerald-200/80",
+          cityInfo?.type === 'wishlist' && "fill-sky-200/50 stroke-sky-200/80"
         );
       })
       .style('vector-effect', 'non-scaling-stroke')
       .on('mouseenter', function(event, d: any) {
-        d3.select(this);
+        d3.select(this).raise();
         d3.select(this).transition().duration(200)
           .style('fill', 'rgba(200,220,255,0.10)')
           .style('transform', 'translateY(-2px)');
@@ -228,7 +225,8 @@ export const TravelMap: React.FC = () => {
       .on('mouseleave', function(event, d: any) {
         d3.select(this).transition().duration(400)
           .style('fill', null)
-          .style('transform', 'translateY(0px)');
+          .style('transform', 'translateY(0px)')
+          .style('stroke', null) // ✅ 必须加
         setHoverCity(null);
       })
       .on('click', function(event, d: any) {
@@ -236,7 +234,7 @@ export const TravelMap: React.FC = () => {
         const cityInfo = d.matchedCityInfo || {
           name: cityName,
           englishName: d.properties.NAME_2 || cityName,
-          province: d.properties.NAME_1 || 'Unknown',
+          province: d.properties.NL_NAME_1 || 'Unknown',
           country: '中国',
           type: 'wishlist',
         };

@@ -80,7 +80,7 @@ export const WeatherEffect: React.FC<WeatherEffectProps> = ({ type }) => {
                 ease: 'linear',
                 delay: Math.random() * 20
               }}
-              className="absolute w-96 h-40 bg-white/5 blur-[80px] rounded-full"
+              className="absolute w-96 h-40 bg-white/25 blur-[80px] rounded-full"
             />
           ))}
         </div>

@@ -3,7 +3,7 @@
     {
       "name": "潍坊市",
       "englishName": "Weifang",
-      "province": "山东省",
+      "province": "山东",
       "country": "中国",
       "type": "resident",
       "residentEmoji": "⭐",
@@ -12,7 +12,7 @@
     {
       "name": "杭州市",
       "englishName": "Hangzhou",
-      "province": "浙江省",
+      "province": "浙江",
       "country": "中国",
       "type": "resident",
       "residentEmoji": "🦎",
@@ -21,7 +21,7 @@
     {
       "name": "济南市",
       "englishName": "Jinan",
-      "province": "山东省",
+      "province": "山东",
       "country": "中国",
       "type": "unlocked",
       "unlockDate": "2025.11.07",
@@ -30,7 +30,7 @@
     {
       "name": "无锡市",
       "englishName": "Wuxi",
-      "province": "江苏省",
+      "province": "江苏",
       "country": "中国",
       "type": "unlocked",
       "unlockDate": "2025.12.31",
@@ -39,7 +39,7 @@
     {
       "name": "许昌市",
       "englishName": "Xuchang",
-      "province": "河南省",
+      "province": "河南",
       "country": "中国",
       "type": "unlocked",
       "unlockDate": "2026.02.22",
@@ -57,7 +57,7 @@
     {
       "name": "苏州市",
       "englishName": "Suzhou",
-      "province": "江苏省",
+      "province": "江苏",
       "country": "中国",
       "type": "unlocked",
       "unlockDate": "2026.04.03",
@@ -74,7 +74,7 @@
     {
       "name": "延边朝鲜族自治州",
       "englishName": "Yanbian Korean Autonomous Prefecture",
-      "province": "吉林省",
+      "province": "吉林",
       "country": "中国",
       "type": "wishlist",
       "wantsToGo": ["🦎"]
@@ -82,7 +82,7 @@
     {
       "name": "南京市",
       "englishName": "Nanjing",
-      "province": "江苏省",
+      "province": "江苏",
       "country": "中国",
       "type": "wishlist",
       "wantsToGo": ["⭐", "🦎"]
@@ -91,6 +91,30 @@
       "name": "Kowloon",
       "englishName": "Kowloon",
       "province": "香港",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["⭐"]
+    },
+    {
+      "name": "甘孜藏族自治州",
+      "englishName": "GarzêTibeta",
+      "province": "四川",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["🦎"]
+    },
+    {
+      "name": "普洱市",
+      "englishName": "Pu'er",
+      "province": "云南",
+      "country": "中国",
+      "type": "wishlist",
+      "wantsToGo": ["⭐"]
+    },
+    {
+      "name": "福州市",
+      "englishName": "Fuzhou",
+      "province": "福建",
       "country": "中国",
       "type": "wishlist",
       "wantsToGo": ["⭐"]
